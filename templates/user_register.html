@@ -1,0 +1,141 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Login</title><title>Admin Dashboard</title><link rel="icon" href="../img/favicon2.png">
+  <base href="{{ request.base_url }}">
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <!-- Bootstrap 3.3.7 -->
+  <link rel="stylesheet" href="static/bower_components/bootstrap/dist/css/bootstrap.min.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="static/bower_components/font-awesome/css/font-awesome.min.css">
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="static/bower_components/Ionicons/css/ionicons.min.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="static/dist/css/AdminLTE.min.css">
+  <!-- iCheck -->
+  <link rel="stylesheet" href="static/plugins/iCheck/square/blue.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body class="hold-transition login-page bg-green">
+
+  {% include 'flash.html' %}
+<div class="login-box">
+  <div class="login-logo">
+    <a href="../"><b>AKcodes</b>Register</a><br>
+    
+  </div>
+  <!-- /.login-logo -->
+  <div class="login-box-body">
+    <p class="login-box-msg">Sign up</p>
+
+    <form method="post" action="{{ url_for('user_register') }}" onsubmit="return validate()">
+        <div class="form-group has-feedback">
+            <input name="name" type="text" class="form-control" placeholder="Name">
+            <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+          </div>
+
+          <div class="form-group has-feedback">
+            <input name="email" type="email" class="form-control" placeholder="Email">
+            <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+          </div>
+
+          <div class="form-group has-feedback">
+            <input name="phone" type="tel" class="form-control" placeholder="Phone Number">
+            <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+          </div>
+
+          <div class="form-group has-feedback">
+            <input name="password" type="password" class="form-control" placeholder="Password" id="password" onchange="validate();">
+            <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+            <div id="password-error" style="color: red;"></div>
+          </div>
+
+          <div class="form-group has-feedback">
+            <input name="confirmpassword" type="text" class="form-control" placeholder="Confirm Password" id="confirm_password" onchange="cpass();">
+            <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+            <div id="cpassword-error" style="color: red;"></div>
+          </div>
+
+          <div class="form-group has-feedback">
+            <input name="classes" type="text" class="form-control" placeholder="Classes">
+            <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+          </div>
+
+      
+
+      <div class="row">
+       
+        <!-- /.col -->
+        <div class="col-xs-12">
+          <button name="submit" value="submit" type="submit" class="btn btn-success btn-block btn-flat">Sign In</button>
+        </div>
+        <h6 class="m-3">Already have an  account? <a href="/login_dashboard.html">Login Now!</a></h6>
+        <!-- /.col -->
+      </div>
+    </form>
+
+   
+
+   
+    <!-- /.social-auth-links -->
+
+   <br>
+    
+
+  </div>
+  <!-- /.login-box-body -->
+</div>
+<!-- /.login-box -->
+
+<!-- jQuery 3 -->
+<script src="static/bower_components/jquery/dist/jquery.min.js"></script>
+<!-- Bootstrap 3.3.7 -->
+<script src="static/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<!-- iCheck -->
+<script src="static/plugins/iCheck/icheck.min.js"></script>
+<script>
+ function validate(){
+    var password = document.getElementById('password').value;
+    var passwordError = document.getElementById('password-error');
+    if(password.length < 8 || !password.match(/[A-Z]/) || !password.match(/[a-z]/) || !password.match(/[0-9]/) || !password.match(/[^A-Za-z0-9]/)){
+      passwordError.innerHTML = "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one digit, and one special character.";
+      return false;
+    } 
+    else{
+         passwordError.innerHTML = "";
+         return true;
+       }
+    
+      }
+
+      function cpass() {
+            if (document.getElementById('password').value != document.getElementById('confirm_password').value) {
+              var cpasswordError = document.getElementById('cpassword-error');
+              cpasswordError.innerHTML = "Passwords do not match.";
+              return false;
+            } else {
+              var cpasswordError = document.getElementById('cpassword-error');
+              cpasswordError.innerHTML = ""; // Clear error message when passwords match
+              return true;
+            }
+
+      }
+  $(function () {
+    $('input').iCheck({
+      checkboxClass: 'icheckbox_square-blue',
+      radioClass: 'iradio_square-blue',
+      increaseArea: '20%' /* optional */
+    });
+  });
+
+
+
+</script>
+</body>
+</html>
