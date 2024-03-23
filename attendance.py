@@ -23,15 +23,15 @@ app.config['MAIL_PASSWORD'] = 'dtvtxofktnxijekn'
 app.config['MAIL_DEFAULT_SENDER'] = 'checkin12390@example.com'
 
 # Configure MySQL
-app.config['MYSQL_HOST'] = 'b9exja7aekbltqudbv2z-mysql.services.clever-cloud.com'
-app.config['MYSQL_USER'] = 'uqpxcxl9bnhhj5dk'
-app.config['MYSQL_PASSWORD'] = 'uqpxcxl9bnhhj5dk'
-app.config['MYSQL_DB'] = 'b9exja7aekbltqudbv2z'
+# app.config['MYSQL_HOST'] = 'bz6lj0wtuursoqtkhwfx-mysql.services.clever-cloud.com'
+# app.config['MYSQL_USER'] = 'ujxcnt7zsraho8ba'
+# app.config['MYSQL_PASSWORD'] = 'hPBWgC9viBAiM2UCVkJb'
+# app.config['MYSQL_DB'] = 'bz6lj0wtuursoqtkhwfx'
 
-# app.config['MYSQL_HOST'] = 'localhost'
-# app.config['MYSQL_USER'] = 'root'
-# app.config['MYSQL_PASSWORD'] = 'root'
-# app.config['MYSQL_DB'] = 'attendance'
+app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = 'root'
+app.config['MYSQL_DB'] = 'attendance'
 
 # Initialize Flask-Mail
 mail = Mail(app)
@@ -51,25 +51,37 @@ def get_user_by_email(email):
 @app.route('/signin.html', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
+        device_id = request.remote_addr
         email = request.form['email']
         password = request.form['password']
 
         cur = mysql.connection.cursor()
-        cur.execute("SELECT usertype, email, name, status FROM users WHERE email = %s AND password = %s", (email, password))
+        cur.execute("SELECT usertype, email, name, status, device_ip FROM users WHERE email = %s AND password = %s AND usertype=%s", (email, password, 'student'))
         user = cur.fetchone()
         cur.close()
 
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT usertype, email, name, status FROM users WHERE email = %s AND password = %s AND usertype=%s", (email, password, 'admin'))
+        admin = cur.fetchone()
+        cur.close()
 
+        if admin:
+            session['usertype'] = admin[0]
+            session['email'] = admin[1]
+            session['name'] = admin[2]
+            return redirect(url_for('index'))
 
-        if user:    
-            if user[3]!="Approved":
-                flash('Your account is not yet approved by the Admin,if you have recently signup kindly wait until admin approves your account','danger')
-                return redirect(url_for('login')) 
+        if user:
+            if user[3] != "Approved":
+                flash('Your account is not yet approved by the Admin, if you have recently signed up, kindly wait until admin approves your account', 'danger')
+                return redirect(url_for('login'))
+            elif user[4] != device_id:
+                flash('Try logging in from the device you have registered', 'danger')
+                return redirect(url_for('login'))
             else:
                 session['usertype'] = user[0]
                 session['email'] = user[1]
                 session['name'] = user[2]
-                
                 return redirect(url_for('index'))
         else:
             flash('Invalid username or password. Please try again.', 'danger')
@@ -171,6 +183,7 @@ def user_register():
 
     if request.method == 'POST':
         # Extract form data
+        device_id = request.remote_addr
         usertype = "student"
         batch_id = request.form['batch_id']
         name = request.form['name']
@@ -203,15 +216,25 @@ def user_register():
         existing_user = cur.fetchone()
         cur.close()
 
+        # Check if the device is already in the database
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT * FROM users WHERE device_ip = %s", (device_id,))
+        existing_device = cur.fetchone()
+        cur.close()
+
         if existing_user:
             # Email is not unique; handle the situation (set alert message)
-            alert_message = 'Email already exists. Please choose a different email.'
-            return render_template('signup.html', alert_message=alert_message)
+            flash('Email already exists. Please choose a different email.')
+            return redirect(url_for('user_register'))
+        
+        if existing_device:
+            flash('Device already exists. Please choose a different Device.')
+            return redirect(url_for('user_register'))
 
         # Insert the user into the database with the photo path
         cur = mysql.connection.cursor()
-        cur.execute("INSERT INTO users (usertype, name, email, phone, password, confirmpassword, classes, photo_path,batch) VALUES (%s, %s, %s, %s, %s, %s, %s, %s,%s)", 
-                    (usertype, name, email, phone, password, confirmpassword, classes, filename,batch_id))
+        cur.execute("INSERT INTO users (usertype, name, email, phone, password, confirmpassword, classes, photo_path,batch,device_ip) VALUES (%s ,%s, %s, %s, %s, %s, %s, %s, %s,%s)", 
+                    (usertype, name, email, phone, password, confirmpassword, classes, filename,batch_id,device_id))
         mysql.connection.commit()
         cur.close()
 
@@ -421,7 +444,7 @@ def edit_profile():
         name = session['name']
 
         cur = mysql.connection.cursor()
-        query = "SELECT * FROM users WHERE email = %s"
+        query = "SELECT `id`, `photo_path`, `name`, `email`, `usertype`, `phone`, `password`, `confirmpassword`, `status`, classes.class_name, batch.batch_name, `device_ip` FROM users,classes,batch WHERE email = %s and users.classes=classes.class_id and users.batch=batch.batch_id;"
         cur.execute(query, (email,))
         user_data = cur.fetchone()
 
