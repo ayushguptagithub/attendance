@@ -23,15 +23,15 @@ app.config['MAIL_PASSWORD'] = 'dtvtxofktnxijekn'
 app.config['MAIL_DEFAULT_SENDER'] = 'checkin12390@example.com'
 
 # Configure MySQL
-# app.config['MYSQL_HOST'] = 'bz6lj0wtuursoqtkhwfx-mysql.services.clever-cloud.com'
-# app.config['MYSQL_USER'] = 'ujxcnt7zsraho8ba'
-# app.config['MYSQL_PASSWORD'] = 'hPBWgC9viBAiM2UCVkJb'
-# app.config['MYSQL_DB'] = 'bz6lj0wtuursoqtkhwfx'
+app.config['MYSQL_HOST'] = 'bz6lj0wtuursoqtkhwfx-mysql.services.clever-cloud.com'
+app.config['MYSQL_USER'] = 'ujxcnt7zsraho8ba'
+app.config['MYSQL_PASSWORD'] = 'hPBWgC9viBAiM2UCVkJb'
+app.config['MYSQL_DB'] = 'bz6lj0wtuursoqtkhwfx'
 
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'root'
-app.config['MYSQL_DB'] = 'attendance'
+# app.config['MYSQL_HOST'] = 'localhost'
+# app.config['MYSQL_USER'] = 'root'
+# app.config['MYSQL_PASSWORD'] = 'root'
+# app.config['MYSQL_DB'] = 'attendance'
 
 # Initialize Flask-Mail
 mail = Mail(app)
